@@ -15,8 +15,8 @@ WEBHOOK_SECRET = os.getenv('GITHUB_WEBHOOK_SECRET')
 integration = GithubIntegration(APP_ID, PRIVATE_KEY)
 
 # Repository and file details
-SOURCE_REPO = 'your-org/copilot-instructions'
-FILE_PATH = 'copilot-instructions.md'
+SOURCE_REPO = 'knepprath/copilot-instructions'
+FILE_PATH = '.github/copilot-instructions.md'
 TARGET_TOPIC = 'copilot'
 
 @app.route('/webhooks', methods=['POST'])
