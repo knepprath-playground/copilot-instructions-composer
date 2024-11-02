@@ -15,8 +15,8 @@ WEBHOOK_SECRET = os.getenv('GITHUB_WEBHOOK_SECRET')
 integration = GithubIntegration(APP_ID, PRIVATE_KEY)
 
 # Repository and file details
-GITHUB_ORG = 'knepprath'
-SOURCE_REPO = 'knepprath/copilot-instructions'
+GITHUB_ORG = 'knepprath-playground'
+SOURCE_REPO = 'knepprath-playground/copilot-instructions'
 FILE_PATH = '.github/copilot-instructions.md'
 TARGET_TOPIC = 'copilot'
 
