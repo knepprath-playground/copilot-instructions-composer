@@ -21,3 +21,11 @@ Set the following environment variables:
 `python server.py`
 
 Update the webhook URL in your GitHub App settings to point to your server's public IP or domain name.
+
+# Integration Setup
+
+Define a repo as source of truth with a copilot-instructions.md
+
+Add the `copilot` topic to a repo in the org
+
+After the github app has been fully set up then push a change to the copilot-instructions.md 
