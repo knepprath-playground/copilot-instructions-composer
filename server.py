@@ -15,6 +15,7 @@ WEBHOOK_SECRET = os.getenv('GITHUB_WEBHOOK_SECRET')
 integration = GithubIntegration(APP_ID, PRIVATE_KEY)
 
 # Repository and file details
+GITHUB_ORG = 'knepprath'
 SOURCE_REPO = 'knepprath/copilot-instructions'
 FILE_PATH = '.github/copilot-instructions.md'
 TARGET_TOPIC = 'copilot'
@@ -50,7 +51,7 @@ def handle_push_event(payload):
         source_repo = github.get_repo(SOURCE_REPO)
         file_content = source_repo.get_contents(FILE_PATH).decoded_content.decode()
 
-        org = github.get_organization('your-org')
+        org = github.get_organization(GITHUB_ORG)
         for repo in org.get_repos():
             if TARGET_TOPIC in repo.get_topics():
                 create_pull_request(repo, file_content)
