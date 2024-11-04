@@ -22,9 +22,12 @@ TARGET_TOPIC = 'copilot'
 
 @app.route('/webhooks', methods=['POST'])
 def webhooks():
+    app.logger.info('Webhook received')
+
     # Verify webhook signature
     signature = request.headers.get('X-Hub-Signature-256')
     if not is_valid_signature(request.data, signature):
+        app.logger.error('Invalid signature')
         abort(401, 'Invalid signature')
 
     event = request.headers.get('X-GitHub-Event')
@@ -54,15 +57,21 @@ def handle_push_event(payload):
         org = github.get_organization(GITHUB_ORG)
         for repo in org.get_repos():
             if TARGET_TOPIC in repo.get_topics():
-                create_pull_request(repo, file_content)
+                create_or_update_pull_request(repo, file_content)
 
-def create_pull_request(repo, file_content):
+def create_or_update_pull_request(repo, file_content):
     branch_name = 'update-copilot-instructions'
     base_branch = repo.default_branch
 
-    # Create a new branch
-    source = repo.get_branch(base_branch)
-    repo.create_git_ref(ref=f'refs/heads/{branch_name}', sha=source.commit.sha)
+    # Create a new branch or update the existing branch
+    try:
+        source = repo.get_branch(base_branch)
+        repo.create_git_ref(ref=f'refs/heads/{branch_name}', sha=source.commit.sha)
+    except:
+        # Branch already exists, update the reference
+        ref = repo.get_git_ref(f'heads/{branch_name}')
+        base_commit = repo.get_branch(base_branch).commit.sha
+        ref.edit(sha=base_commit, force=True)
 
     # Create or update the file
     try:
@@ -72,7 +81,11 @@ def create_pull_request(repo, file_content):
         repo.create_file(FILE_PATH, 'Add copilot-instructions.md', file_content, branch=branch_name)
 
     # Create a pull request
-    repo.create_pull(title='Update copilot-instructions.md', body='This PR updates the copilot-instructions.md file.', head=branch_name, base=base_branch)
+    try:
+        repo.create_pull(title='Update copilot-instructions.md', body='This PR updates the copilot-instructions.md file.', head=branch_name, base=base_branch)
+    except:
+        # Pull request already exists, update it if necessary
+        pass
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=3000)
